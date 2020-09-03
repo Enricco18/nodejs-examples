@@ -28,8 +28,6 @@ router.get('/minimum-secure', async (req, res) => {
     if (!versionData.security) {
       return;
     }
-
-    //const [version, subversion, bugfix] = versionData.version.split('.');
     const version = `v${semver.major(versionData.version)}`;
     const minor = semver.minor(versionData.version);
     const patch = semver.patch(versionData.version)
