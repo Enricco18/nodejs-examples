@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const bent = require('bent');
+const semver = require('semver');
 
 const { dependencies } = require('../package.json');
 
@@ -28,7 +29,10 @@ router.get('/minimum-secure', async (req, res) => {
       return;
     }
 
-    const [version, subversion, bugfix] = versionData.version.split('.');
+    //const [version, subversion, bugfix] = versionData.version.split('.');
+    const version = `v${semver.major(versionData.version)}`;
+    const minor = semver.minor(versionData.version);
+    const patch = semver.patch(versionData.version)
 
 
     if (!minimumSecure[version]) {
@@ -36,12 +40,12 @@ router.get('/minimum-secure', async (req, res) => {
       return;
     }
 
-    if (parseInt(subversion) > parseInt(minimumSecure[version].version.split('.')[1])) {
+    if (minor > semver.minor(minimumSecure[version].version)) {
       minimumSecure[version] = versionData
       return;
     }
-    if (parseInt(subversion) === parseInt(minimumSecure[version].version.split('.')[1])) {
-      if (parseInt(bugfix) > parseInt(minimumSecure[version].version.split('.')[2])) {
+    if (minor === semver.minor(minimumSecure[version].version)) {
+      if (patch > semver.patch(minimumSecure[version].version)) {
         minimumSecure[version] = versionData
         return;
       }
@@ -57,20 +61,22 @@ router.get('/latest-releases', async (req, res) => {
   const latestVersion = {};
 
   nodeVersionJson.forEach(versionData => {
-    const [version, subversion, bugfix] = versionData.version.split('.');
+    const version = `v${semver.major(versionData.version)}`;
+    const minor = semver.minor(versionData.version);
+    const patch = semver.patch(versionData.version)
+
 
     if (!latestVersion[version]) {
       latestVersion[version] = versionData
       return;
     }
 
-    if (parseInt(subversion) > parseInt(latestVersion[version].version.split('.')[1])) {
+    if (minor > semver.minor(latestVersion[version].version)) {
       latestVersion[version] = versionData
       return;
     }
-
-    if (parseInt(subversion) === parseInt(latestVersion[version].version.split('.')[1])) {
-      if (parseInt(bugfix) > parseInt(latestVersion[version].version.split('.')[2])) {
+    if (minor === semver.minor(latestVersion[version].version)) {
+      if (patch > semver.patch(latestVersion[version].version)) {
         latestVersion[version] = versionData
         return;
       }
