@@ -20,7 +20,9 @@ router.get('/dependencies', (req, res) => {
 router.get('/minimum-secure', async (req, res) => {
   const getJson = bent('json');
   const nodeVersionJson = await getJson('https://nodejs.org/dist/index.json');
+
   const minimumSecure = {};
+
   nodeVersionJson.reverse().forEach(versionData => {
     if (!versionData.security) {
       return;
@@ -34,13 +36,15 @@ router.get('/minimum-secure', async (req, res) => {
       return;
     }
 
-    if (minimumSecure[version].version.split('.')[1] < subversion) {
+    if (parseInt(subversion) > parseInt(minimumSecure[version].version.split('.')[1])) {
       minimumSecure[version] = versionData
       return;
     }
-    if (minimumSecure[version].version.split('.')[2] < bugfix) {
-      minimumSecure[version] = versionData
-      return;
+    if (parseInt(subversion) === parseInt(minimumSecure[version].version.split('.')[1])) {
+      if (parseInt(bugfix) > parseInt(minimumSecure[version].version.split('.')[2])) {
+        minimumSecure[version] = versionData
+        return;
+      }
     }
   })
   return res.json(minimumSecure);
@@ -51,23 +55,27 @@ router.get('/latest-releases', async (req, res) => {
   const nodeVersionJson = await getJson('https://nodejs.org/dist/index.json');
 
   const latestVersion = {};
+
   nodeVersionJson.forEach(versionData => {
     const [version, subversion, bugfix] = versionData.version.split('.');
-
 
     if (!latestVersion[version]) {
       latestVersion[version] = versionData
       return;
     }
 
-    if (latestVersion[version].version.split('.')[1] < subversion) {
+    if (parseInt(subversion) > parseInt(latestVersion[version].version.split('.')[1])) {
       latestVersion[version] = versionData
       return;
     }
-    if (latestVersion[version].version.split('.')[2] < bugfix) {
-      latestVersion[version] = versionData
-      return;
+
+    if (parseInt(subversion) === parseInt(latestVersion[version].version.split('.')[1])) {
+      if (parseInt(bugfix) > parseInt(latestVersion[version].version.split('.')[2])) {
+        latestVersion[version] = versionData
+        return;
+      }
     }
+
   })
   return res.json(latestVersion);
 })
