@@ -29,8 +29,6 @@ router.get('/minimum-secure', async (req, res) => {
       return;
     }
     const version = `v${semver.major(versionData.version)}`;
-    const minor = semver.minor(versionData.version);
-    const patch = semver.patch(versionData.version)
 
 
     if (!minimumSecure[version]) {
@@ -38,15 +36,9 @@ router.get('/minimum-secure', async (req, res) => {
       return;
     }
 
-    if (minor > semver.minor(minimumSecure[version].version)) {
+    if (semver.gt(versionData.version, minimumSecure[version].version)) {
       minimumSecure[version] = versionData
       return;
-    }
-    if (minor === semver.minor(minimumSecure[version].version)) {
-      if (patch > semver.patch(minimumSecure[version].version)) {
-        minimumSecure[version] = versionData
-        return;
-      }
     }
   })
   return res.json(minimumSecure);
@@ -60,24 +52,15 @@ router.get('/latest-releases', async (req, res) => {
 
   nodeVersionJson.forEach(versionData => {
     const version = `v${semver.major(versionData.version)}`;
-    const minor = semver.minor(versionData.version);
-    const patch = semver.patch(versionData.version)
-
 
     if (!latestVersion[version]) {
       latestVersion[version] = versionData
       return;
     }
 
-    if (minor > semver.minor(latestVersion[version].version)) {
+    if (semver.gt(versionData.version, latestVersion[version].version)) {
       latestVersion[version] = versionData
       return;
-    }
-    if (minor === semver.minor(latestVersion[version].version)) {
-      if (patch > semver.patch(latestVersion[version].version)) {
-        latestVersion[version] = versionData
-        return;
-      }
     }
 
   })
